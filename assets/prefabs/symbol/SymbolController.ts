@@ -12,15 +12,23 @@ export class SymbolController extends Component {
     @property({ type: FrameSwitcher })
     symbol: FrameSwitcher = null;
 
-    public changeSymbol(): void {
-        this.symbol.currentFrameIndex = Math.floor(Math.random() * 6);
+    public changeSymbol(index: number): void {
+        this.symbol.currentFrameIndex = index;
     }
 
-    changeSize(size: number = 0): void {
-        tween(this.back.scale)
-            .to(2, new Vec3(this.back.scale.x, 0.5, this.back.scale.z))
-            .delay(3)
-            .start();
+    changeSize(scale: number = 0, time: number): void {
+        if (!time || time === 0) {
+            this.back.scale = new Vec3(this.back.scale.x, scale, this.back.scale.z);
+            this.symbol.node.scale = new Vec3(scale, scale, 1);
+        } else {
+            tween(this.back)
+                .to(time, { scale: new Vec3(this.back.scale.x, scale, this.back.scale.z) })
+                .start();
+
+            tween(this.symbol.node)
+                .to(time, { scale: new Vec3(scale, scale, 1) })
+                .start();
+        }
 
     }
 }

@@ -2,7 +2,8 @@ import { _decorator, Component } from 'cc';
 import GlobalEventManager from 'scripts/GlobalEventManager';
 import { ReelsManager } from './ReelsManager';
 import { UIManager } from './UIManager';
-import { StopReelsData } from 'scripts/model/Types';
+import { InitData, ReelsData, SpinData } from 'scripts/model/Types';
+import { NetworkManager } from './NetworkManager';
 
 const { ccclass, property } = _decorator;
 
@@ -15,17 +16,24 @@ export class SlotGameManager extends Component {
     @property({ type: UIManager })
     uiManager: UIManager = null;
 
+    @property({ type: NetworkManager })
+    networkManager: NetworkManager = null;
+
     private balance: number = 1000;
     private betAmount: number = 10;
 
     private isSpinning: boolean = false;
 
     onLoad() {
+        GlobalEventManager.getInstance().on('spinPressed', this.startSpin, this);
+        GlobalEventManager.getInstance().on('stopPressed', this.stopSpin, this);
+
         this.uiManager.updateBalanceDisplay(this.balance);
         this.uiManager.updateBetDisplay(this.betAmount);
 
-        GlobalEventManager.getInstance().on('spinPressed', this.startSpin, this);
-        GlobalEventManager.getInstance().on('stopPressed', this.stopSpin, this);
+        this.networkManager.init((data: InitData) => {
+            this.reelsManager.init(data);
+        });
     }
 
     private startSpin(): void {
@@ -33,35 +41,17 @@ export class SlotGameManager extends Component {
             this.isSpinning = true;
             this.reelsManager.startSpin();
 
-            setTimeout(() => {
-                this.stopSpin();
-            }, 1000)
+
+            this.networkManager.spin((data: SpinData) => {
+                setTimeout(() => {
+                    this.stopSpin(data);
+                }, 1000)
+            });
         }
     }
 
-    private stopSpin(): void {
-
-        const reelsStopData: StopReelsData = {
-            reels: [
-                {
-                    symbols: [0, 2, 4, 5, 6],
-                },
-                {
-                    symbols: [1, 2, 3, 2, 6],
-                },
-                {
-                    symbols: [2, 2, 1, 1, 2],
-                },
-                {
-                    symbols: [2, 5, 1, 3, 2],
-                },
-                {
-                    symbols: [0, 2, 4, 5, 4],
-                },
-            ]
-        }
-
-        this.reelsManager.stopSpin(reelsStopData);
+    private stopSpin(data: SpinData): void {
+        this.reelsManager.stopSpin(data);
     }
 
     public onSpinComplete(): void {
@@ -69,7 +59,7 @@ export class SlotGameManager extends Component {
     }
 
     private calculateWin(): void {
-        const winAmount = this.betAmount * 2; // Пример: удвоение ставки как выигрыш
+        const winAmount = this.betAmount * 2;
         this.balance += winAmount;
 
         this.uiManager.updateBalanceDisplay(this.balance);

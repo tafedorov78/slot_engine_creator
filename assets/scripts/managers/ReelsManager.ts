@@ -1,8 +1,9 @@
 import { _decorator, Component, Node } from 'cc';
-import { ReelController } from 'prefabs/reel/ReelController';
-import { StopReelsData } from 'scripts/model/Types';
+import { InitData, ReelsData } from 'scripts/model/Types';
 import { SlotGameManager } from './SlotGameManager';
 import GlobalEventManager from 'scripts/GlobalEventManager';
+import { ReelController } from 'prefabs/reel/ReelController';
+import ReelsSettings from 'scripts/model/ReelsSettings';
 const { ccclass, property } = _decorator;
 
 @ccclass('ReelsManager')
@@ -21,10 +22,23 @@ export class ReelsManager extends Component {
         GlobalEventManager.getInstance().on('reelStopped', this.onReelStopped, this);
     }
 
+    public init(data: InitData): void {
+        for (let i: number = 0; i < this.reels.length; i++) {
+            const reelController = this.reels[i].getComponent(ReelController);
+            if (reelController) {
+                reelController.init(data.reels[i]);
+            } else {
+                console.error('Reel node is not found!');
+
+            }
+        }
+    }
+
     public startSpin(): void {
         this.spinningReelsCount = this.reels.length;
 
-        for (let reel of this.reels) {
+        for (let i = 0; i < this.reels.length; i++) {
+            const reel = this.reels[i];
             const reelController = reel.getComponent(ReelController);
             if (reelController) {
                 reelController.startSpin();
@@ -32,14 +46,14 @@ export class ReelsManager extends Component {
         }
     }
 
-    public stopSpin(data: StopReelsData): void {
+    public stopSpin(data: ReelsData): void {
         for (let i = 0; i < this.reels.length; i++) {
             const reel = this.reels[i];
             const reelController = reel.getComponent(ReelController);
             if (reelController) {
                 setTimeout(() => {
-                    reelController.stopSpin(data.reels[0]);
-                }, i * 200);
+                    reelController.stopSpin(data.reels[i]);
+                }, i * ReelsSettings.default_delay_between_reels);
             }
         }
     }
@@ -55,5 +69,6 @@ export class ReelsManager extends Component {
     onDestroy(): void {
         GlobalEventManager.getInstance().off('reelStopped', this.onReelStopped, this);
     }
+
 }
 
