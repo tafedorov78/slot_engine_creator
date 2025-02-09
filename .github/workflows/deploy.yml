@@ -18,3 +18,14 @@ jobs:
         https://api.github.com/repos/${{ github.repository }}
 
     - name: Build Project
+      run: |
+        # Команды для сборки вашего проекта
+        # Например, если у вас есть скрипт сборки:
+        # npm install
+        # npm run build
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/web-mobile  # Укажите директорию с собранным проектом
