@@ -1,4 +1,6 @@
 export default {
+    defaultSymbolsInReel: 3,
+
     scales: {
         1: 1,
         2: 0.9,
@@ -9,5 +11,7 @@ export default {
         7: 0.4,
         8: 0.3
     },
-    default_delay_between_reels: 200
+    default_delay_between_reels: 100,
+    extend_duration: 0.2,
+    reset_duration: 0.4
 }

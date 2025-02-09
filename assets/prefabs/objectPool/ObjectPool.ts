@@ -1,46 +1,43 @@
 import { _decorator, Component, Prefab, instantiate, Node } from 'cc';
+import { mylog } from 'scripts/ult/Utils';
 const { ccclass, property } = _decorator;
 
 @ccclass('ObjectPool')
 export class ObjectPool extends Component {
-    @property({ type: Prefab }) // Префаб объектов для пула
+    @property({ type: Prefab })
     objectPrefab: Prefab = null;
 
-    private pool: Node[] = []; // Пул для хранения неиспользуемых объектов
+    private pool: Node[] = [];
 
-    // Метод для предварительной загрузки объектов в пул
     public preload(count: number) {
         for (let i = 0; i < count; i++) {
             const obj = instantiate(this.objectPrefab);
-            obj.active = false; // Деактивируем объект
-            this.pool.push(obj); // Добавляем объект в пул
+            obj.active = false;
+            this.pool.push(obj);
         }
     }
 
-    // Получить объект из пула
     public getObject(): Node {
         let obj: Node;
         if (this.pool.length > 0) {
             obj = this.pool.pop();
         } else {
-            obj = instantiate(this.objectPrefab); // Создаем новый, если пул пуст
+            obj = instantiate(this.objectPrefab);
         }
-        obj.active = true; // Активируем объект перед использованием
+        obj.active = true;
         return obj;
     }
 
-    // Вернуть объект в пул
     public releaseObject(obj: Node) {
         obj.removeFromParent();
-        obj.active = false; // Деактивируем объект перед возвратом
-        this.pool.push(obj); // Добавляем его обратно в пул
+        obj.active = false;
+        this.pool.push(obj);
     }
 
-    // Очистка пула, если нужно освободить память
     public clear() {
         while (this.pool.length > 0) {
             const obj = this.pool.pop();
-            obj.destroy(); // Уничтожаем объект
+            obj.destroy();
         }
     }
 

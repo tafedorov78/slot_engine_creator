@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, tween, Vec3 } from 'cc';
-import { FrameSwitcher } from 'prefabs/frameSwitcher/FrameSwitcher';
+import { NodeSwitcher } from 'prefabs/nodeSwitcher/NodeSwitcher';
 
 const { ccclass, property } = _decorator;
 
@@ -9,11 +9,11 @@ export class SymbolController extends Component {
     @property({ type: Node })
     back: Node = null;
 
-    @property({ type: FrameSwitcher })
-    symbol: FrameSwitcher = null;
+    @property({ type: NodeSwitcher })
+    symbol: NodeSwitcher = null;
 
     public changeSymbol(index: number): void {
-        this.symbol.currentFrameIndex = index;
+        this.symbol.currentNodeIndex = index;
     }
 
     changeSize(scale: number = 0, time: number): void {
@@ -29,6 +29,13 @@ export class SymbolController extends Component {
                 .to(time, { scale: new Vec3(scale, scale, 1) })
                 .start();
         }
+    }
 
+    public hightlight(): void {
+        tween(this.node)
+            .to(0.1, { scale: new Vec3(1.4, 1.4, 1.4) })
+            .to(0.6, { scale: new Vec3(1, 1, 1) })
+            .union()
+            .start();
     }
 }
