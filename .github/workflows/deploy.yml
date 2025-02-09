@@ -1,8 +1,3 @@
-- name: Check GitHub Token permissions
-  run: |
-    curl -H "Authorization: token ${{ secrets.GH_PAT }}" \
-    https://api.github.com/repos/tafedorov78/slot_engine_creator
-
 name: Deploy to GitHub Pages
 
 on:
@@ -14,16 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Check GitHub Token permissions
+      run: |
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        https://api.github.com/repos/${{ github.repository }}
 
     - name: Build Project
-      run: |
-        # Команды для сборки вашего проекта
-        # Например, если у вас есть скрипт сборки:
-        # npm install
-        # npm run build
-
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/web-mobile  # Укажите директорию с собранным проектом
