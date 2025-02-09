@@ -1,3 +1,8 @@
+- name: Check GitHub Token permissions
+  run: |
+    curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+    https://api.github.com/repos/tafedorov78/slot_engine_creator
+
 name: Deploy to GitHub Pages
 
 on:
