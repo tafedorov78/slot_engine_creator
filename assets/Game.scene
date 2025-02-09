@@ -550,7 +550,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 750,
+    "_orthoHeight": 905.3164556962025,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -709,8 +709,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 72.26337660227391,
-      "height": 50.4
+      "width": 72.26315268987342,
+      "height": 50.400000000000006
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -742,7 +742,7 @@
     "_string": "Balance",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -841,8 +841,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 30.014548396432637,
-      "height": 50.4
+      "width": 30.014452712948312,
+      "height": 50.400000000000006
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -874,7 +874,7 @@
     "_string": "Bet",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -973,8 +973,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 34.43763682384365,
-      "height": 50.4
+      "width": 34.437528843618146,
+      "height": 50.400000000000006
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1006,7 +1006,7 @@
     "_string": "Win",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1193,7 +1193,7 @@
     "_string": "Start",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1505,7 +1505,7 @@
     "_string": "Stop",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1817,7 +1817,7 @@
     "_string": "button",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2129,7 +2129,7 @@
     "_string": "button",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2605,7 +2605,7 @@
     "_string": "Start",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2929,8 +2929,8 @@
     ],
     "value": {
       "__type__": "cc.Size",
-      "width": 96.69292020481944,
-      "height": 50.4
+      "width": 96.69260532041139,
+      "height": 50.400000000000006
     }
   },
   {
@@ -2949,8 +2949,8 @@
     ],
     "value": {
       "__type__": "cc.Size",
-      "width": 42.24882820584127,
-      "height": 50.4
+      "width": 42.24869997692511,
+      "height": 50.400000000000006
     }
   },
   {
@@ -3197,7 +3197,7 @@
     "_string": "Start",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20.133333333333333,
+    "_actualFontSize": 29.625,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -3521,8 +3521,8 @@
     ],
     "value": {
       "__type__": "cc.Size",
-      "width": 96.69292020481944,
-      "height": 50.4
+      "width": 96.69260532041139,
+      "height": 50.400000000000006
     }
   },
   {
@@ -3541,8 +3541,8 @@
     ],
     "value": {
       "__type__": "cc.Size",
-      "width": 42.24882820584127,
-      "height": 50.4
+      "width": 42.24869997692511,
+      "height": 50.400000000000006
     }
   },
   {
