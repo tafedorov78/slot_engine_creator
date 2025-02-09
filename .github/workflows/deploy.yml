@@ -14,7 +14,7 @@ jobs:
 
     - name: Check GitHub Token permissions
       run: |
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        curl -H "Authorization: token ${{ secrets.GH_PAT }}" \
         https://api.github.com/repos/${{ github.repository }}
 
     - name: Build Project
