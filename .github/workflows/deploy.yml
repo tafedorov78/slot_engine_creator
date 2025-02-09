@@ -2,30 +2,31 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]  # Укажите вашу основную ветку
+    branches: [main]  # Деплой будет выполняться при пуше в main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Check GitHub Token permissions
-      run: |
-        curl -H "Authorization: token ${{ secrets.GH_PAT }}" \
-        https://api.github.com/repos/${{ github.repository }}
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Укажи нужную версию Node.js
+
+    - name: Install Dependencies
+      run: npm install
 
     - name: Build Project
-      run: |
-        # Команды для сборки вашего проекта
-        # Например, если у вас есть скрипт сборки:
-        # npm install
-        # npm run build
+      run: npm run build  # Убедись, что билд создается в ./docs или ./build/web-mobile
 
-    - name: Deploy
+    - name: Deploy to GitHub Pages (main branch)
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/web-mobile  # Укажите директорию с собранным проектом
+        github_token: ${{ secrets.GH_PAT }}
+        publish_branch: main  # Деплой прямо в main
+        publish_dir: ./build/web-mobile  # Директория с билдом
+        keep_files: true  # Оставляет другие файлы в main
