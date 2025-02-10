@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]  # Деплой с ветки main
+    branches: [main]
 
 jobs:
   deploy:
@@ -12,9 +12,27 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/web-mobile  # Укажи правильную папку с файлами
-        publish_branch: main  # Публикуем прямо в main, а не в gh-pages
+    - name: Deploy files to main
+      run: |
+        # Указываем папку, которую нужно добавить в репозиторий
+        FOLDER_TO_DEPLOY="./build/web-mobile"
+
+        # Проверяем, существует ли папка
+        if [ -d "$FOLDER_TO_DEPLOY" ]; then
+          echo "Deploying files from $FOLDER_TO_DEPLOY"
+
+          # Копируем файлы в корень репозитория
+          cp -r $FOLDER_TO_DEPLOY/* .
+
+          # Настройка git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Добавляем изменения в репозиторий
+          git add .
+          git commit -m "Deploy to GitHub Pages" || echo "No changes to commit"
+          git push origin main
+        else
+          echo "❌ Error: Folder $FOLDER_TO_DEPLOY does not exist!"
+          exit 1
+        fi
