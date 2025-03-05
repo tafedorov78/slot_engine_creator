@@ -7,6 +7,10 @@ import { GameStates } from "../StatesEnum";
 export class SpinState extends BaseState {
 
   begin(data?: any) {
+    if (!this.model.isRespin && !this.model.freespins) {
+      GlobalEventManager.getInstance().emit(GameEvents.BALANCE_UPDATE, this.model.balance - this.model.currentBet);
+    }
+
     GlobalEventManager.getInstance().once(GameEvents.SPIN_RESPONSE, this.end);
     GlobalEventManager.getInstance().emit(GameEvents.SPIN_REQUEST);
     GlobalEventManager.getInstance().emit(GameEvents.SPIN_START);

@@ -1,23 +1,27 @@
 import { _decorator, Component, log } from 'cc';
 import { GameStateMachine } from './gameStates/GameStateMachine';
 import { GameStates, GameStatesPriority } from './gameStates/StatesEnum';
-import { FreespinsData, SpecialSymbolType, SpinData } from './Types';
+import { FreespinsData, InitData, SpecialSymbolType, SpinData } from './Types';
 import { checkForSpecialSymbols } from 'scripts/ult/Utils';
+import GlobalEventManager from 'scripts/GlobalEventManager';
+import { GameEvents } from 'scripts/gameEvents/GameEvents';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameModel')
 export class GameModel extends Component {
 
 
+    public initData: InitData = null;
     public spinData: SpinData = null;
     public stateQueue: { state: GameStates; data: any }[] = [];
     public isAutoplay: boolean = false;
     public isRespin: boolean = false;
-    public fsLeft: number;
+    public fsLeft: number = 0;
+    public balance: number = 0;
+    public currentBet: number = 0;
 
     private _freespins: FreespinsData = null;
     private _gameStateModel: GameStateMachine = null;
-
 
     start() {
         this._gameStateModel = new GameStateMachine(this, GameStates);
@@ -26,8 +30,19 @@ export class GameModel extends Component {
         this.stateQueue = [];
     }
 
+    public storeInitData(data: InitData): void {
+        this.initData = data;
+        this.balance = data.balance;
+        this.currentBet = data.current_bet;
+
+        GlobalEventManager.getInstance().emit(GameEvents.INIT_GAME, this.initData);
+    }
+
     public storeSpinData(data: SpinData): void {
         this.spinData = data;
+
+        this.balance = data.balance;
+        this.currentBet = data.current_bet;
 
         this.freespins = this.spinData.freespins;
 

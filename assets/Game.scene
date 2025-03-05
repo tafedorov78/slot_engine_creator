@@ -550,7 +550,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 750,
+    "_orthoHeight": 1365.9701492537313,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -4055,14 +4055,17 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "gameModel": {
+      "__id__": 6
+    },
     "balanceLabel": {
-      "__id__": 18
+      "__id__": 21
     },
     "betLabel": {
-      "__id__": 24
+      "__id__": 27
     },
     "winMessageLabel": {
-      "__id__": 30
+      "__id__": 33
     },
     "spinButton": {
       "__id__": 40

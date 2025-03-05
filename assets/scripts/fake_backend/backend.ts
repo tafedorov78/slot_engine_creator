@@ -1,5 +1,5 @@
 import { FreespinsData, InitData, SpinData } from 'scripts/model/Types';
-import { calculateTotalWayWin, calculateTotalWin, findPathForNumber } from './find_ways';
+import { calculateTotalWayWin, findPathForNumber } from './find_ways';
 import reels from './reels';
 import { generateReel } from './spin';
 import { findSymbolPositions, getSubsequence } from './utl';
@@ -8,6 +8,13 @@ import paytable from './paytable';
 const TOTAL_REELS = 6;
 
 export class backend {
+
+    balance: number = 1000;
+    betsAvalilable: number[] = [1, 2, 3];
+    currentBet: number = 1;
+
+    isRespin: boolean = false;
+
     reels: number[][] = null;
 
     currentSize: number = 0;
@@ -31,9 +38,9 @@ export class backend {
     init(): InitData {
 
         const data: InitData = {
-            balance: 1000,
-            bets_available: [0.1, 0.2, 0.3],
-            current_bet: 0.1,
+            balance: this.balance,
+            bets_available: this.betsAvalilable,
+            current_bet: this.currentBet,
             symbols: [
                 [0, 1, 3],
                 [2, 1, 3],
@@ -56,9 +63,13 @@ export class backend {
 
         const ways = findPathForNumber(symbols, paytable.paytable, 9);
 
+        if (!this.freespins && !this.isRespin) {
+            this.balance -= this.currentBet;
+        }
+
         const res: SpinData = {
-            balance: 1000,
-            current_bet: 0.1,
+            balance: this.balance,
+            current_bet: this.currentBet,
             symbols: symbols,
             winnings: {
                 total: 0,
@@ -76,8 +87,14 @@ export class backend {
             res.winnings.total += res.winnings.ways;
 
 
-            if (!this.freespins) res.is_respin = true;
+            if (!this.freespins) {
+                this.isRespin = true;
+            }
+        } else {
+            this.isRespin = false;
         }
+
+        res.is_respin = this.isRespin;
 
         let specials = [];
 
@@ -163,6 +180,8 @@ export class backend {
         if (specials.length > 0) {
             res.specials = specials;
         }
+
+        this.balance = res.balance += res.winnings.total;
 
         console.log('spin response: ', res);
 

@@ -16,7 +16,7 @@ export class ReelsManager extends Component {
     private spinningReelsCount: number = 0;
 
     protected onLoad(): void {
-        GlobalEventManager.getInstance().once(GameEvents.INIT_RESPONSE, this.init.bind(this));
+        GlobalEventManager.getInstance().once(GameEvents.INIT_GAME, this.init.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.SPIN_START, this.startSpin.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.SPIN_STOP, this.stopSpin.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.ADD_LINE_START, this.onAddLine.bind(this));
