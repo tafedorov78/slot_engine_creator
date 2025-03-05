@@ -2,8 +2,9 @@ import { _decorator, Component, Node } from 'cc';
 import { ReelController } from 'prefabs/reel/ReelController';
 import { GameEvents } from 'scripts/gameEvents/GameEvents';
 import GlobalEventManager from 'scripts/GlobalEventManager';
-import { InitData, SpecialSymbolData, SpinData, WaysData } from 'scripts/model/Types';
+import { InitData, SpecialSymbolData, SpecialSymbolType, SpinData, WaysData } from 'scripts/model/Types';
 import ReelsSettings from 'scripts/settings/ReelsSettings';
+import { checkForSpecialSymbols } from 'scripts/ult/Utils';
 const { ccclass, property } = _decorator;
 
 @ccclass('ReelsManager')
@@ -21,7 +22,7 @@ export class ReelsManager extends Component {
         GlobalEventManager.getInstance().on(GameEvents.ADD_LINE_START, this.onAddLine.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.RESET_LINES_START, this.onResetLines.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.SHOW_WAYS_START, this.onShowWays.bind(this));
-        GlobalEventManager.getInstance().on(GameEvents.LUCKY_MONEY_START, this.onShowLuckyMoney.bind(this));
+        GlobalEventManager.getInstance().on(GameEvents.STOP_FORTUNE_SYMBOLS, this.onStopFortuneSymbols.bind(this));
 
         GlobalEventManager.getInstance().on('reelStopped', this.onReelStopped, this);
     }
@@ -53,13 +54,22 @@ export class ReelsManager extends Component {
     }
 
     private stopSpin(data: SpinData): void {
+        let delay: number = 0;
         for (let i = 0; i < this.reels.length; i++) {
             const reel = this.reels[i];
             const reelController = reel.getComponent(ReelController);
+
             if (reelController) {
+                if (data.symbols[i].includes(6)) {
+                    delay += ReelsSettings.special_delay_between_reels;
+                    reelController.setSpeed(ReelsSettings.default_reel_speed);
+                } else {
+                    delay += ReelsSettings.default_delay_between_reels;
+                }
+
                 setTimeout(() => {
                     reelController.stopSpin(data.symbols[i], data.is_reset);
-                }, i * ReelsSettings.default_delay_between_reels);
+                }, delay);
             }
         }
     }
@@ -97,12 +107,12 @@ export class ReelsManager extends Component {
         }, 1200);
     }
 
-    private onShowLuckyMoney(symbols: SpecialSymbolData[]): void {
+    private onStopFortuneSymbols(symbols: SpecialSymbolData[]): void {
         symbols.forEach((symbol: SpecialSymbolData) => {
             this.reels[symbol.i].getComponent(ReelController).highlight(symbol.j);
         })
         setTimeout(() => {
-            GlobalEventManager.getInstance().emit(GameEvents.LUCKY_MONEY_COMPLETE);
+            GlobalEventManager.getInstance().emit(GameEvents.STOP_FORTUNE_SYMBOLS_COMPLETE);
         }, 1200);
     }
 

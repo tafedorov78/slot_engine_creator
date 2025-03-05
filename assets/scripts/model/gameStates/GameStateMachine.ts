@@ -4,13 +4,13 @@ import { AddLineState } from "./states/AddLineState";
 import { FinalState } from "./states/FinalState";
 import { IdleState } from "./states/IdleState";
 import { InitState } from "./states/InitState";
-import { LuckyMoneyState } from "./states/LuckyMoneyState";
 import { ResetLinesState } from "./states/ResetLinesState";
 import { ShowWaysState } from "./states/ShowWaysState";
 import { SpinState } from "./states/SpinState";
 import { StartFreespinsState } from "./states/StartFreespinsState";
 import { StopFreespinsState } from "./states/StopFreespinsState";
 import { StopState } from "./states/StopState";
+import { StopFortuneSymbolsState } from "./states/StopFortuneSymbolsState";
 
 export class GameStateMachine extends StateMachine implements IStateMachine {
 
@@ -26,7 +26,7 @@ export class GameStateMachine extends StateMachine implements IStateMachine {
     this.addState(SpinState, stateEnum.SPIN);
     this.addState(StopState, stateEnum.STOP);
     this.addState(ShowWaysState, stateEnum.SHOW_WAYS);
-    this.addState(LuckyMoneyState, stateEnum.LUCKY_MONEY);
+    this.addState(StopFortuneSymbolsState, stateEnum.STOP_FORTUNE_SYMBOLS);
     this.addState(AddLineState, stateEnum.ADD_LINE);
     this.addState(ResetLinesState, stateEnum.RESET_LINES);
     this.addState(StartFreespinsState, stateEnum.START_FREESPINS);

@@ -8,7 +8,7 @@ export class IdleState extends BaseState {
   begin(data?: any) {
     GlobalEventManager.getInstance().emit(GameEvents.IDLE_START);
 
-    if (this.model.isAutoplay) {
+    if (this.model.isRespin || this.model.isAutoplay) {
       this.end();
     } else {
       GlobalEventManager.getInstance().once('spinPressed', this.end, this);

@@ -10,6 +10,7 @@ export class ShowWaysState extends BaseState {
   begin(data: WaysData) {
     GlobalEventManager.getInstance().once(GameEvents.SHOW_WAYS_COMPLETE, this.end);
     GlobalEventManager.getInstance().emit(GameEvents.SHOW_WAYS_START, getUniquePositions(data));
+    GlobalEventManager.getInstance().emit(GameEvents.SHOW_WINNINGS, this.model.spinData.winnings.ways);
   }
 
   end = (): void => {

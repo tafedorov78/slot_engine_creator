@@ -12,12 +12,11 @@ export class GameModel extends Component {
     public spinData: SpinData = null;
     public stateQueue: { state: GameStates; data: any }[] = [];
     public isAutoplay: boolean = false;
+    public isRespin: boolean = false;
     public fsLeft: number;
 
     private _freespins: FreespinsData = null;
     private _gameStateModel: GameStateMachine = null;
-
-    private currentStateIndex: number = 0;
 
 
     start() {
@@ -29,11 +28,12 @@ export class GameModel extends Component {
 
     public storeSpinData(data: SpinData): void {
         this.spinData = data;
-        this.currentStateIndex = 0;
 
         this.freespins = this.spinData.freespins;
 
         this.stateQueue.length = 0;
+
+        this.isRespin = data.is_respin;
 
         if (data.ways) {
             this.stateQueue.push({ state: GameStates.SHOW_WAYS, data: data.ways });
@@ -55,9 +55,9 @@ export class GameModel extends Component {
             this.stateQueue.push({ state: GameStates.ADD_LINE, data: data.add_lines });
         }
 
-        const luckyMoneySymbols = checkForSpecialSymbols(data, SpecialSymbolType.money);
-        if (luckyMoneySymbols && luckyMoneySymbols.length > 0) {
-            this.stateQueue.push({ state: GameStates.LUCKY_MONEY, data: luckyMoneySymbols });
+        const furtuneSymbols = checkForSpecialSymbols(data, SpecialSymbolType.fortune);
+        if (furtuneSymbols && furtuneSymbols.length > 0) {
+            this.stateQueue.push({ state: GameStates.STOP_FORTUNE_SYMBOLS, data: furtuneSymbols });
         }
 
         this.stateQueue.sort((a, b) => {

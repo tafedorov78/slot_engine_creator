@@ -1,15 +1,17 @@
 const WILD = 9;
 
-export function findPathForNumber(reels: number[][]) {
-    const paths: { symbol: number, path: number[] }[] = [];
+export function findPathForNumber(reels: number[][], paytable: { symbol: number, payout: number[] }[], WILD: number): { symbol: number, path: number[], payout: number }[] {
+    const paths: { symbol: number, path: number[], payout: number }[] = [];
 
     function ddd(colIndex: number, prevIndex: number, currentPath: number[], value: number) {
         if (colIndex >= reels.length) {
-            paths.push({ symbol: reels[0][currentPath[0]], path: [...currentPath] });
+            const symbol = reels[0][currentPath[0]];
+            const payout = getPayout(symbol, currentPath.length, paytable);
+            paths.push({ symbol, path: [...currentPath], payout });
             return;
         }
 
-        // Получаем все возможные соседние индексы для текущего значения или для "9" (wildcard)
+        // Получаем все возможные соседние индексы для текущего значения или для "WILD"
         const positions = reels[colIndex]
             .map((v, idx) => ((v === value || v === WILD) && Math.abs(idx - prevIndex) <= 1 ? idx : -1))
             .filter(idx => idx !== -1);
@@ -20,7 +22,8 @@ export function findPathForNumber(reels: number[][]) {
             }
         } else if (currentPath.length > 2) {
             // Фиксируем найденный путь, если он достаточно длинный
-            paths.push({ symbol: value, path: [...currentPath] });
+            const payout = getPayout(value, currentPath.length, paytable);
+            paths.push({ symbol: value, path: [...currentPath], payout });
         }
     }
 
@@ -29,4 +32,13 @@ export function findPathForNumber(reels: number[][]) {
     }
 
     return paths;
+}
+
+function getPayout(symbol: number, length: number, paytable: { symbol: number, payout: number[] }[]): number {
+    const entry = paytable.find(entry => entry.symbol === symbol);
+    return entry ? (entry.payout[length - 1] || 0) : 0;
+}
+
+export function calculateTotalWayWin(ways: { symbol: number, path: number[], payout: number }[]): number {
+    return ways.reduce((total, way) => total + way.payout, 0);
 }

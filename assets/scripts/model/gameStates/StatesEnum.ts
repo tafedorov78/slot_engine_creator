@@ -4,7 +4,7 @@ export enum GameStates {
   SPIN = 'SPIN',
   STOP = 'STOP',
   SHOW_WAYS = 'SHOW_WAYS',
-  LUCKY_MONEY = 'LUCKY_MONEY',
+  STOP_FORTUNE_SYMBOLS = 'STOP_FORTUNE_SYMBOLS',
   ADD_LINE = 'ADD_LINE',
   RESET_LINES = 'RESET_LINES',
   START_FREESPINS = 'START_FREESPINS',
@@ -13,7 +13,7 @@ export enum GameStates {
 }
 
 export const GameStatesPriority = {
-  LUCKY_MONEY: 1,
+  STOP_FORTUNE_SYMBOLS: 1,
   SHOW_WAYS: 2,
   ADD_LINE: 3,
   RESET_LINES: 3,

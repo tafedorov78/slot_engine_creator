@@ -23,22 +23,11 @@ export class NetworkManager extends Component {
     public init(): void {
         this.backend = new backend(ReelsSettings.defaultSymbolsInReel);
 
-        const data: InitData = {
-            symbols: [
-                [0, 1, 3],
-                [0, 1, 3],
-                [0, 1, 3],
-                [0, 1, 3],
-                [0, 1, 3],
-                [0, 1, 3]
-            ]
-        }
-        this.sendResult(GameEvents.INIT_RESPONSE, data)
+        this.sendResult(GameEvents.INIT_RESPONSE, this.backend.init())
     }
 
     public spin(): void {
-        const data: SpinData = this.backend.spin();
-        this.sendResult(GameEvents.SPIN_RESPONSE, data);
+        this.sendResult(GameEvents.SPIN_RESPONSE, this.backend.spin());
     }
 
     private sendResult(event: string, data: any): void {

@@ -1,9 +1,8 @@
-import { _decorator, CCInteger, Component, log, Node, tween, Vec3 } from 'cc';
+import { _decorator, CCInteger, Component, log, Node, tween, UITransform, Vec3 } from 'cc';
 import { ObjectPool } from 'prefabs/objectPool/ObjectPool';
 import { SymbolController } from 'prefabs/symbol/SymbolController';
 import GlobalEventManager from 'scripts/GlobalEventManager';
 import ReelsSettings from 'scripts/settings/ReelsSettings';
-import { ReelMaskComponent } from './ReelMaskComponent';
 
 const { ccclass, property } = _decorator;
 
@@ -12,7 +11,6 @@ export class ReelController extends Component {
 
     @property({ type: ObjectPool }) objectPool: ObjectPool = null;
     @property({ type: Node }) symbolsContainer: Node = null;
-    @property({ type: ReelMaskComponent }) mask: ReelMaskComponent = null;
     @property({ type: CCInteger }) visibleSymbols: number = 3;
     @property({ type: CCInteger }) index: number = 0;
     @property({ type: Number }) spinSpeed: number = 45;
@@ -24,7 +22,7 @@ export class ReelController extends Component {
     public totalReelHeight: number = 0;
 
     private stopCounter: number = 0;
-    private bottomLine: number = -320;
+    private bottomLine: number = 0;
     private bottomSymbolY: number = 0;
 
     private symbols: Node[] = [];
@@ -48,9 +46,9 @@ export class ReelController extends Component {
         this.currentScale = ReelsSettings.scales[data.length];
         this.totalReelHeight = this.calculateTotalReelHeight(data.length)
 
-        const symbolsWithPadding = [0, ...data, 0];
+        const symbolsWithPadding = [6, ...data, 2];
         const initializedSymbols = this.createSymbols(symbolsWithPadding);
-
+        const p = this.symbolsContainer.getPosition().y;
         this.addInitSymbolsToContainer(initializedSymbols);
 
         this.bottomSymbol = this.getBottomSymbol();
@@ -58,7 +56,6 @@ export class ReelController extends Component {
 
         this.center(0);
 
-        this.mask.setMask(this.symbols[1].getPosition().y, this.symbols[this.symbols.length - 2].getPosition().y, this.symbolHeight * this.currentScale);
     }
 
     calculateTotalReelHeight(symbolCount: number) {
@@ -86,8 +83,13 @@ export class ReelController extends Component {
         this.symbols[index + 1].getComponent(SymbolController).hightlight();
     }
 
+    public setSpeed(value: number): void {
+        this.spinSpeed = value;
+    }
+
 
     public startSpin() {
+        this.setSpeed(ReelsSettings.default_reel_speed);
         this.bottomSymbol = this.getBottomSymbol();
         this.bottomSymbolY = this.bottomSymbol.position.y;
         this.bottomLine = this.calculateBottomLine();
@@ -99,7 +101,7 @@ export class ReelController extends Component {
         this.stopCounter = 0;
         this.toReset = toReset;
         this.isSpinning = false;
-        const symbolsWithExtra = [0, ...this.stopReelData, 0];
+        const symbolsWithExtra = [1, ...this.stopReelData, 0];
 
         const stopSymbols: Node[] = this.createSymbols(symbolsWithExtra);
         this.addStopSymbolsOnTop(stopSymbols);
@@ -110,7 +112,7 @@ export class ReelController extends Component {
         const res: Node[] = [];
 
         for (let i = 0; i < data.length; i++) {
-            res.unshift(this.createSymbol(data[i]));
+            res.push(this.createSymbol(data[i]));
         }
         return res;
     }
@@ -123,11 +125,12 @@ export class ReelController extends Component {
     }
 
     private addStopSymbolsOnTop(symbols: Node[]): void {
-        symbols.forEach((symbol: Node) => {
+        for (let i = symbols.length - 1; i >= 0; i--) {
+            const symbol = symbols[i];
             this.symbolsContainer.addChild(symbol);
             this.moveSymbolOnTop(symbol);
             this.symbols.unshift(symbol);
-        })
+        }
     }
 
     private finishAnimation(): void {
@@ -199,7 +202,8 @@ export class ReelController extends Component {
         this.totalReelHeight = this.calculateTotalReelHeight(this.visibleSymbols);
 
         this.center(ReelsSettings.extend_duration);
-        this.mask.animateMask(this.symbols[1].getPosition().y, this.symbols[this.symbols.length - 2].getPosition().y, this.symbolHeight * this.currentScale, ReelsSettings.extend_duration, callback);
+        callback();
+
     };
 
     public reset(callback: () => void): void {
@@ -208,7 +212,6 @@ export class ReelController extends Component {
         this.totalReelHeight = this.calculateTotalReelHeight(this.visibleSymbols);
 
         this.center(ReelsSettings.reset_duration);
-        this.mask.animateMask(this.symbols[1].getPosition().y, this.symbols[ReelsSettings.defaultSymbolsInReel].getPosition().y, this.symbolHeight * this.currentScale, ReelsSettings.reset_duration);
 
         setTimeout(() => {
             this.removeExtraSymbols(true);
@@ -218,9 +221,8 @@ export class ReelController extends Component {
 
     private moveSymbolToBottom(symbol: Node): void {
         const lastSymbol = this.symbols[this.symbols.length - 1];
-        const position = lastSymbol?.position ?? new Vec3(0, 0, 0);
-
-        const y = this.symbols.length === 0 ? 0 : position.y - this.symbolHeight * this.currentScale;
+        const position = lastSymbol?.position ?? new Vec3(0, 0, 80);
+        const y = this.symbols.length === 0 ? 80 : position.y - this.symbolHeight * this.currentScale;
         symbol.setPosition(position.x, y, position.z);
     }
 
@@ -237,14 +239,24 @@ export class ReelController extends Component {
         });
     };
 
+    maskUpdate(duration: number): void {
+        const uiTransform = this.symbolsContainer.getComponent(UITransform);
+
+        tween(uiTransform)
+            .to(duration, { height: this.visibleSymbols * this.symbolHeight }, { easing: 'quadOut' })
+            .start();
+    }
+
     center(duration: number): void {
         const pos = this.node.getPosition();
-        const targetY = (-450 + (this.totalReelHeight / 2)) - (this.symbolHeight * this.currentScale) / 2;
+        const targetY = (this.visibleSymbols - ReelsSettings.defaultSymbolsInReel) * this.symbolHeight / 2;
 
         const targetPosition = new Vec3(pos.x, targetY, pos.z);
 
+        this.maskUpdate(duration);
+
         tween(this.node)
-            .to(duration, { position: targetPosition }, { easing: 'quadOut' }) // 0.5 — время анимации
+            .to(duration, { position: targetPosition }, { easing: 'quadOut' })
             .start();
     }
 

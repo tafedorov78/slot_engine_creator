@@ -1,8 +1,9 @@
-import { FreespinsData, SpinData } from 'scripts/model/Types';
-import { findPathForNumber } from './find_ways';
+import { FreespinsData, InitData, SpinData } from 'scripts/model/Types';
+import { calculateTotalWayWin, calculateTotalWin, findPathForNumber } from './find_ways';
 import reels from './reels';
 import { generateReel } from './spin';
 import { findSymbolPositions, getSubsequence } from './utl';
+import paytable from './paytable';
 
 const TOTAL_REELS = 6;
 
@@ -27,6 +28,25 @@ export class backend {
         }
     }
 
+    init(): InitData {
+
+        const data: InitData = {
+            balance: 1000,
+            bets_available: [0.1, 0.2, 0.3],
+            current_bet: 0.1,
+            symbols: [
+                [0, 1, 3],
+                [2, 1, 3],
+                [0, 1, 3],
+                [0, 1, 3],
+                [0, 1, 3],
+                [0, 1, 3]
+            ]
+        }
+
+        return data;
+    }
+
     spin(): SpinData {
         const symbols: number[][] = [];
 
@@ -34,25 +54,36 @@ export class backend {
             symbols.push(getSubsequence(reels.data[i], this.currentSize));
         }
 
-        const ways = findPathForNumber(symbols);
+        const ways = findPathForNumber(symbols, paytable.paytable, 9);
 
         const res: SpinData = {
-            symbols: symbols
+            balance: 1000,
+            current_bet: 0.1,
+            symbols: symbols,
+            winnings: {
+                total: 0,
+                ways: 0,
+                fortune: 0
+            }
         };
 
         if (ways.length > 0) {
-            res['ways'] = {
-                ways: ways
+            res.ways = {
+                ways: ways,
             }
 
-            //if (!this.freespins) res.is_respin = true;
+            res.winnings.ways += calculateTotalWayWin(ways);
+            res.winnings.total += res.winnings.ways;
+
+
+            if (!this.freespins) res.is_respin = true;
         }
 
         let specials = [];
 
         const keys = findSymbolPositions(symbols, 8);
         const fs = findSymbolPositions(symbols, 7);
-        const lm = findSymbolPositions(symbols, 6);
+        const fortunes = findSymbolPositions(symbols, 6);
         const bg = findSymbolPositions(symbols, 5);
 
         if (keys.length > 0) {
@@ -117,14 +148,16 @@ export class backend {
 
         if (this.freespins) {
             res.freespins = this.freespins;
+
             if (this.freespins.left === 0) {
                 res.is_reset = true;
                 this.currentSize = 3;
+                this.freespins = null;
             }
         }
 
 
-        if (lm.length > 0) specials = [...lm, ...specials];
+        if (fortunes.length > 0) specials = [...fortunes, ...specials];
         if (bg.length > 0) specials = [...bg, ...specials];
 
         if (specials.length > 0) {

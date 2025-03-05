@@ -2,17 +2,29 @@
 export type SymbolType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export type InitData = {
-    symbols: number[][]
+    balance: number,
+    symbols: number[][],
+    current_bet: number,
+    bets_available: number[]
 }
 
 export type SpinData = {
+    balance: number,
+    current_bet: number,
     symbols: number[][],
     ways?: WaysData,
     specials?: SpecialSymbolData[],
     freespins?: FreespinsData,
     is_respin?: boolean,
     is_reset?: boolean,
-    add_lines?: number
+    add_lines?: number,
+    winnings: Winnings
+}
+
+export type Winnings = {
+    total: number,
+    ways?: number,
+    fortune?: number
 }
 
 export type SpecialSymbolData = {
@@ -28,6 +40,7 @@ export type WaysData = {
 export type Way = {
     symbol: number,
     path: number[]
+    payout: number
 }
 
 export type FreespinsData = {
@@ -40,6 +53,6 @@ export enum SpecialSymbolType {
     key = 'key',
     bonus = 'bonus',
     freespins = 'freespins',
-    money = 'money',
+    fortune = 'fortune',
     wild = 'wild',
 }
