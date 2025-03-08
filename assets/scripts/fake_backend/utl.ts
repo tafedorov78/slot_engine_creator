@@ -1,3 +1,4 @@
+import { SpecialSymbolData } from "scripts/model/Types";
 import SymbolsSettings from "scripts/settings/SymbolsSettings";
 
 export function generateSequence() {
@@ -17,8 +18,8 @@ export function getSubsequence(sequence: number[], length: number, manualStart: 
     return subsequence;
 }
 
-export function findSymbolPositions(reels: number[][], targetSymbol: number) {
-    const positions: { type: string, i: number, j: number }[] = [];
+export function findSymbolPositions(reels: number[][], targetSymbol: number): SpecialSymbolData[] {
+    const positions: SpecialSymbolData[] = [];
 
     for (let i = 0; i < reels.length; i++) {
         for (let j = 0; j < reels[i].length; j++) {

@@ -127,7 +127,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 211.2720661569149,
+      "width": 211.279296875,
       "height": 126
     },
     "_anchorPoint": {
@@ -166,7 +166,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 146.875,
+    "_actualFontSize": 100,
     "_fontSize": 100,
     "_fontFamily": "Arial",
     "_lineHeight": 100,
@@ -262,7 +262,7 @@
     "__prefab": {
       "__id__": 11
     },
-    "numberLabel": {
+    "label": {
       "__id__": 5
     },
     "_id": ""

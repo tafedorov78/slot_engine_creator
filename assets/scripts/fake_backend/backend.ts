@@ -1,4 +1,4 @@
-import { FreespinsData, InitData, SpinData } from 'scripts/model/Types';
+import { FreespinsData, InitData, SpecialSymbolData, SpecialSymbolType, SpinData } from 'scripts/model/Types';
 import { calculateTotalWayWin, findPathForNumber } from './find_ways';
 import reels from './reels';
 import { generateReel } from './spin';
@@ -100,7 +100,7 @@ export class backend {
 
         const keys = findSymbolPositions(symbols, 8);
         const fs = findSymbolPositions(symbols, 7);
-        const fortunes = findSymbolPositions(symbols, 6);
+        let fortunes: SpecialSymbolData[] = findSymbolPositions(symbols, 6);
         const bg = findSymbolPositions(symbols, 5);
 
         if (keys.length > 0) {
@@ -174,7 +174,14 @@ export class backend {
         }
 
 
-        if (fortunes.length > 0) specials = [...fortunes, ...specials];
+        if (fortunes.length > 0) {
+            fortunes = this.generateWinningsFor(fortunes);
+            res.winnings.fortune = this.calculateTotalWin(fortunes);
+            res.winnings.total += res.winnings.fortune;
+
+            specials = [...fortunes, ...specials];
+        }
+
         if (bg.length > 0) specials = [...bg, ...specials];
 
         if (specials.length > 0) {
@@ -188,7 +195,47 @@ export class backend {
         return res;
     }
 
+    generateWinningsFor(symbols: { type: string, i: number, j: number }[]): SpecialSymbolData[] {
+        const res: SpecialSymbolData[] = [];
 
+        function getAmount(): string {
+            return `$${2 + Math.floor(Math.random() * 20)}`;
+        }
+
+        function getMultiplier(): string {
+            return `X${2 + Math.floor(Math.random() * 10)}`;
+        }
+
+        symbols.forEach((symbol) => {
+            const s: SpecialSymbolData = {
+                i: symbol.i,
+                j: symbol.j,
+                type: symbol.type as SpecialSymbolType,
+                winData: Math.random() > 0.5 ? getAmount() : getMultiplier()
+            }
+            res.push(s);
+        });
+
+        return res;
+    }
+
+    calculateTotalWin(symbols: SpecialSymbolData[]): number {
+        let totalMoney = 0;
+        let totalMultiplier = 0;
+
+        symbols.forEach((win) => {
+            if (win.winData.startsWith('$')) {
+                totalMoney += parseInt(win.winData.substring(1)); // Убираем символ "$" и конвертируем в число
+            } else if (win.winData.startsWith('X')) {
+                totalMultiplier += parseInt(win.winData.substring(1)); // Убираем "X" и конвертируем в число
+            }
+        });
+
+        // Если не было множителей, устанавливаем минимум 1
+        totalMultiplier = Math.max(totalMultiplier, 1);
+
+        return totalMoney * totalMultiplier;
+    }
 
 
 

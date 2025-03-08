@@ -30,6 +30,7 @@ export type Winnings = {
 export type SpecialSymbolData = {
     i: number,
     j: number,
+    winData?: string,
     type: SpecialSymbolType
 }
 

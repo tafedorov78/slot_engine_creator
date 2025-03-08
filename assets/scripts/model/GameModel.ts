@@ -1,7 +1,7 @@
 import { _decorator, Component, log } from 'cc';
 import { GameStateMachine } from './gameStates/GameStateMachine';
 import { GameStates, GameStatesPriority } from './gameStates/StatesEnum';
-import { FreespinsData, InitData, SpecialSymbolType, SpinData } from './Types';
+import { FreespinsData, InitData, SpecialSymbolData, SpecialSymbolType, SpinData } from './Types';
 import { checkForSpecialSymbols } from 'scripts/ult/Utils';
 import GlobalEventManager from 'scripts/GlobalEventManager';
 import { GameEvents } from 'scripts/gameEvents/GameEvents';
@@ -19,6 +19,7 @@ export class GameModel extends Component {
     public fsLeft: number = 0;
     public balance: number = 0;
     public currentBet: number = 0;
+    public fortuneSymbols: SpecialSymbolData[] = null;
 
     private _freespins: FreespinsData = null;
     private _gameStateModel: GameStateMachine = null;
@@ -70,9 +71,9 @@ export class GameModel extends Component {
             this.stateQueue.push({ state: GameStates.ADD_LINE, data: data.add_lines });
         }
 
-        const furtuneSymbols = checkForSpecialSymbols(data, SpecialSymbolType.fortune);
-        if (furtuneSymbols && furtuneSymbols.length > 0) {
-            this.stateQueue.push({ state: GameStates.STOP_FORTUNE_SYMBOLS, data: furtuneSymbols });
+        this.fortuneSymbols = checkForSpecialSymbols(data, SpecialSymbolType.fortune);
+        if (this.fortuneSymbols && this.fortuneSymbols.length > 0) {
+            this.stateQueue.push({ state: GameStates.SHOW_FORTUNE_SYMBOLS_RESULT, data: this.fortuneSymbols });
         }
 
         this.stateQueue.sort((a, b) => {

@@ -11,7 +11,7 @@ export class StopState extends BaseState {
     GlobalEventManager.getInstance().once(GameEvents.SPIN_COMPLETE, this.end);
 
     setTimeout(() => {
-      GlobalEventManager.getInstance().emit(GameEvents.SPIN_STOP, this.model.spinData);
+      GlobalEventManager.getInstance().emit(GameEvents.SPIN_STOP, this.model.spinData, this.model.fortuneSymbols);
     }, 1000);
   }
 

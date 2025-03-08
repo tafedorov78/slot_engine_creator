@@ -12,7 +12,10 @@ export class SymbolController extends Component {
     @property({ type: NodeSwitcher })
     symbol: NodeSwitcher = null;
 
+    index: number = 0;
+
     public changeSymbol(index: number): void {
+        this.index = index;
         this.symbol.currentNodeIndex = index;
     }
 

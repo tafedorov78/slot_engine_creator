@@ -1,10 +1,10 @@
 import { _decorator, Component, Node } from 'cc';
+import { FortuneSymbolComponent } from 'prefabs/fortuneSymbol/scripts/FortuneSymbolComponent';
 import { ReelController } from 'prefabs/reel/ReelController';
 import { GameEvents } from 'scripts/gameEvents/GameEvents';
 import GlobalEventManager from 'scripts/GlobalEventManager';
-import { InitData, SpecialSymbolData, SpecialSymbolType, SpinData, WaysData } from 'scripts/model/Types';
+import { InitData, SpecialSymbolData, SpinData } from 'scripts/model/Types';
 import ReelsSettings from 'scripts/settings/ReelsSettings';
-import { checkForSpecialSymbols } from 'scripts/ult/Utils';
 const { ccclass, property } = _decorator;
 
 @ccclass('ReelsManager')
@@ -13,6 +13,8 @@ export class ReelsManager extends Component {
     @property({ type: Node })
     reels: Node[] = [];
 
+    private fortuneSymbolComponents: Map<number, FortuneSymbolComponent> = null
+    private fortuneSymbols: SpecialSymbolData[] = null;
     private spinningReelsCount: number = 0;
 
     protected onLoad(): void {
@@ -22,8 +24,9 @@ export class ReelsManager extends Component {
         GlobalEventManager.getInstance().on(GameEvents.ADD_LINE_START, this.onAddLine.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.RESET_LINES_START, this.onResetLines.bind(this));
         GlobalEventManager.getInstance().on(GameEvents.SHOW_WAYS_START, this.onShowWays.bind(this));
-        GlobalEventManager.getInstance().on(GameEvents.STOP_FORTUNE_SYMBOLS, this.onStopFortuneSymbols.bind(this));
+        GlobalEventManager.getInstance().on(GameEvents.STOP_FORTUNE_SYMBOL, this.onStopFortuneSymbol.bind(this));
 
+        GlobalEventManager.getInstance().on('reelTouched', this.onReelTouched, this);
         GlobalEventManager.getInstance().on('reelStopped', this.onReelStopped, this);
     }
 
@@ -42,6 +45,7 @@ export class ReelsManager extends Component {
     }
 
     private startSpin(): void {
+        this.fortuneSymbolComponents = new Map();
         this.spinningReelsCount = this.reels.length;
 
         for (let i = 0; i < this.reels.length; i++) {
@@ -53,7 +57,8 @@ export class ReelsManager extends Component {
         }
     }
 
-    private stopSpin(data: SpinData): void {
+    private stopSpin(data: SpinData, fortuneSymbols: SpecialSymbolData[] = null): void {
+        this.fortuneSymbols = fortuneSymbols;
         let delay: number = 0;
         for (let i = 0; i < this.reels.length; i++) {
             const reel = this.reels[i];
@@ -74,11 +79,18 @@ export class ReelsManager extends Component {
         }
     }
 
-    private onReelStopped() {
+    private onReelStopped(index: number) {
         this.spinningReelsCount--;
         if (this.spinningReelsCount === 0) {
             GlobalEventManager.getInstance().emit(GameEvents.SPIN_COMPLETE);
         }
+    }
+
+    private onReelTouched(index: number, symbol: FortuneSymbolComponent) {
+        if (!this.fortuneSymbols) return;
+        this.fortuneSymbolComponents.set(index, symbol);
+        const s = this.fortuneSymbols.find((fs) => fs.i === index);
+        symbol.startSpin(s.winData);
     }
 
     private onAddLine(newLinesAmount: number): void {
@@ -107,13 +119,11 @@ export class ReelsManager extends Component {
         }, 1200);
     }
 
-    private onStopFortuneSymbols(symbols: SpecialSymbolData[]): void {
-        symbols.forEach((symbol: SpecialSymbolData) => {
-            this.reels[symbol.i].getComponent(ReelController).highlight(symbol.j);
-        })
-        setTimeout(() => {
-            GlobalEventManager.getInstance().emit(GameEvents.STOP_FORTUNE_SYMBOLS_COMPLETE);
-        }, 1200);
+    private onStopFortuneSymbol(symbolData: SpecialSymbolData): void {
+        console.log('onStopFortuneSymbol');
+
+        const symbol = this.fortuneSymbolComponents.get(symbolData.i);
+        symbol.stopSpin();
     }
 
     private onResetLines(): void {

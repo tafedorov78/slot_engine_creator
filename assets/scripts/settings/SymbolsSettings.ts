@@ -12,5 +12,6 @@ export default {
         9: 'wild'
     },
 
-    WILD: 9
+    WILD: 9,
+    FORTUNE: 6
 }

@@ -1,8 +1,10 @@
-import { _decorator, CCInteger, Component, log, Node, tween, UITransform, Vec3 } from 'cc';
+import { _decorator, CCInteger, Component, log, Node, tween, TweenEasing, UITransform, Vec3 } from 'cc';
+import { FortuneSymbolComponent } from 'prefabs/fortuneSymbol/scripts/FortuneSymbolComponent';
 import { ObjectPool } from 'prefabs/objectPool/ObjectPool';
 import { SymbolController } from 'prefabs/symbol/SymbolController';
 import GlobalEventManager from 'scripts/GlobalEventManager';
 import ReelsSettings from 'scripts/settings/ReelsSettings';
+import SymbolsSettings from 'scripts/settings/SymbolsSettings';
 
 const { ccclass, property } = _decorator;
 
@@ -55,7 +57,6 @@ export class ReelController extends Component {
         this.bottomLine = this.calculateBottomLine();
 
         this.center(0);
-
     }
 
     calculateTotalReelHeight(symbolCount: number) {
@@ -112,7 +113,8 @@ export class ReelController extends Component {
         const res: Node[] = [];
 
         for (let i = 0; i < data.length; i++) {
-            res.push(this.createSymbol(data[i]));
+            const symbol: Node = this.createSymbol(data[i]);
+            res.push(symbol);
         }
         return res;
     }
@@ -134,13 +136,37 @@ export class ReelController extends Component {
     }
 
     private finishAnimation(): void {
+        let durationDown: number = 0.3;
+        let durationUp: number = 0.1;
+        let easing: TweenEasing = 'quadOut';
+        let shift = ReelsSettings.default_stopping_shift;
+
+        if (this.stopReelData.includes(SymbolsSettings.FORTUNE)) {
+            shift = ReelsSettings.special_stopping_shift;
+            durationDown = 0.3;
+            durationUp = 0.6;
+            easing = 'quadIn';
+        }
+
         const dy = this.bottomSymbolY - this.symbols[this.visibleSymbols + 1].position.y;
         this.symbols.forEach((symbol: Node) => {
+
             tween(symbol)
-                .to(0.3, { position: new Vec3(symbol.position.x, symbol.position.y + dy, symbol.position.z) }, { easing: 'backOut' })
+                .to(durationDown, { position: new Vec3(symbol.position.x, (symbol.position.y + dy) - shift, symbol.position.z) }, { easing: easing })
+                .call(() => this.onTouchDown(symbol))
+                .to(durationUp, { position: new Vec3(symbol.position.x, symbol.position.y + dy, symbol.position.z) }, { easing: 'quadOut' })
                 .call(() => this.onFinishSymbolTween(symbol))
                 .start();
         });
+    }
+
+    private onTouchDown(symbol: Node): void {
+        const symbolController = symbol.getComponent(SymbolController);
+
+        if (symbolController.index === SymbolsSettings.FORTUNE) {
+            const fortuneSymbolComponent = symbolController.symbol.getCurrentNode().getComponent(FortuneSymbolComponent);
+            GlobalEventManager.getInstance().emit('reelTouched', this.index, fortuneSymbolComponent);
+        }
     }
 
     private onFinishSymbolTween(symbol: Node): void {

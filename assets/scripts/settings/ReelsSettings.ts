@@ -16,6 +16,9 @@ export default {
     default_reel_speed: 65,
     special_reel_speed: 140,
 
+    default_stopping_shift: 10,
+    special_stopping_shift: 180,
+
     extend_duration: 0.2,
     reset_duration: 0.4
 }
